@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
@@ -30,6 +30,10 @@ def echo():
     else:
         result = num1 / num2
     return f"Result: {result}"
+
+@app.route('/template', methods=['GET'])
+def home():
+    return render_template('home.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
