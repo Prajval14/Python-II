@@ -5,9 +5,10 @@ import random
 # MongoDB configuration
 client = MongoClient('localhost', 27017)
 db = client['blackjack']
-collection = db['players']
-collection = db['cards']
-collection = db['gamehistory']
+players_collection = db['players']
+cards_collection = db['cards']
+suits_collection = db['suits']
+history_collection = db['gamehistory']
 
 # database_name = 'blackjack'
 # client.drop_database(database_name)
@@ -33,15 +34,45 @@ cards_data = [
     {'name': 'king', 'value': 10},
 ]
 
+suits_data = [
+    {'name': 'hearts', 'value': 'H'},
+    {'name': 'spades', 'value': 'S'},
+    {'name': 'diamond', 'value': 'D'},
+    {'name': 'clubs', 'value': 'C'}
+]
+
 db.players.insert_many(player_data)
 db.cards.insert_many(cards_data)
+db.suits.insert_many(suits_data)
+
+def createDeck():    
+    deck = [{'name': card['name'], 'value': card['value'], 'suit': suit['value']} 
+            # needs to change this access from local to mongo db
+            for card in cards_data for suit in suits_data]
+    
+    random.shuffle(deck)
+
+    return deck
+
+def distributeCards(deck):  
+    dealer_hand = []
+    player_hand = []
+
+    dealer_hand.append(deck.pop())
+    player_hand.append(deck.pop())
+    dealer_hand.append(deck.pop())
+    player_hand.append(deck.pop())
+
+    return dealer_hand
 
 # Creating a flask application instance
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html')
+    initial_deck = createDeck()
+    dealer_hand = distributeCards(initial_deck)
+    return render_template('index.html', dealer_hand=dealer_hand)
 
 if __name__ == '__main__':
     app.run(debug=True)

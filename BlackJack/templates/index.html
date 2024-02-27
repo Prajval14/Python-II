@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlackJack</title>
-    <link rel="stylesheet" href="../blackjack.css" />
-    <script src="../blackjack.js"></script>
+    <link rel="stylesheet" href="../static/blackjack.css" />
+    <script src="../static/blackjack.js"></script>
 </head>
 <body>
+    <div id="dealer-hand" style="display: none;">{{ dealer_hand | tojson }}</div>    
     <div class="container">
         <h1>♠️♥ BlackJack ♦️♣️</h1>
         <div id="dealer">
             <h2>Dealer</h2>
-            <img id="hidden">
-            <img id="dealer_cards">
+            <div id="dealer_cards">
+                <img id="hidden" src="../static/images/cards/BACK.png">
+            </div>            
         </div>
         <div id="player">
             <h2>Player</h2>
-            <img id="player_cards">
+            <div class="player_cards"></div>            
         </div>
         <button type="button">HIT</button>
         <button type="button">STAY</button>
