@@ -13,46 +13,44 @@ history_collection = db['gamehistory']
 # database_name = 'blackjack'
 # client.drop_database(database_name)
 
-player_data = [
-    {'id': 1, 'name': 'dealer'},
-    {'id': 2, 'name': 'player'}
-]
+# player_data = [
+#     {'id': 1, 'name': 'dealer'},
+#     {'id': 2, 'name': 'player'}
+# ]
 
-cards_data = [
-    {'name': 'ace', 'value': 1},
-    {'name': 'two', 'value': 2},
-    {'name': 'three', 'value': 3},
-    {'name': 'four', 'value': 4},
-    {'name': 'five', 'value': 5},
-    {'name': 'six', 'value': 6},
-    {'name': 'seven', 'value': 7},
-    {'name': 'eight', 'value': 8},
-    {'name': 'nine', 'value': 9},
-    {'name': 'ten', 'value': 10},
-    {'name': 'jack', 'value': 10},
-    {'name': 'queen', 'value': 10},
-    {'name': 'king', 'value': 10},
-]
+# cards_data = [
+#     {'name': 'ace', 'value': 1},
+#     {'name': 'two', 'value': 2},
+#     {'name': 'three', 'value': 3},
+#     {'name': 'four', 'value': 4},
+#     {'name': 'five', 'value': 5},
+#     {'name': 'six', 'value': 6},
+#     {'name': 'seven', 'value': 7},
+#     {'name': 'eight', 'value': 8},
+#     {'name': 'nine', 'value': 9},
+#     {'name': 'ten', 'value': 10},
+#     {'name': 'jack', 'value': 10},
+#     {'name': 'queen', 'value': 10},
+#     {'name': 'king', 'value': 10},
+# ]
 
-suits_data = [
-    {'name': 'hearts', 'value': 'H'},
-    {'name': 'spades', 'value': 'S'},
-    {'name': 'diamond', 'value': 'D'},
-    {'name': 'clubs', 'value': 'C'}
-]
+# suits_data = [
+#     {'name': 'hearts', 'value': 'H'},
+#     {'name': 'spades', 'value': 'S'},
+#     {'name': 'diamond', 'value': 'D'},
+#     {'name': 'clubs', 'value': 'C'}
+# ]
 
-db.players.insert_many(player_data)
-db.cards.insert_many(cards_data)
-db.suits.insert_many(suits_data)
+# db.players.insert_many(player_data)
+# db.cards.insert_many(cards_data)
+# db.suits.insert_many(suits_data)
 
 def createDeck():   
-    deck = [] 
-    cards_list = cards_collection.find()  
-    suits_list = suits_collection.find()
+    deck = []
 
-    for card in cards_list:
-        for suit in suits_list:
-            deck.append({'name': card['name'], 'value': card['value'], 'suit': suit})
+    for card in cards_collection.find():
+        for suit in suits_collection.find():
+            deck.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})
     
     random.shuffle(deck)
 

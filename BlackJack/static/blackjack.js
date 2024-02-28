@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     var dealer_hand = JSON.parse(document.getElementById("dealer-hand").textContent);
-    console.log(dealer_hand);
-
+    
     startGame(dealer_hand)
 });
 
