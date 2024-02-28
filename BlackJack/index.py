@@ -45,10 +45,14 @@ db.players.insert_many(player_data)
 db.cards.insert_many(cards_data)
 db.suits.insert_many(suits_data)
 
-def createDeck():    
-    deck = [{'name': card['name'], 'value': card['value'], 'suit': suit['value']} 
-            # needs to change this access from local to mongo db
-            for card in cards_data for suit in suits_data]
+def createDeck():   
+    deck = [] 
+    cards_list = cards_collection.find()  
+    suits_list = suits_collection.find()
+
+    for card in cards_list:
+        for suit in suits_list:
+            deck.append({'name': card['name'], 'value': card['value'], 'suit': suit})
     
     random.shuffle(deck)
 
