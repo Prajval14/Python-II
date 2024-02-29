@@ -9,7 +9,8 @@
 </head>
 <body>
     <div id="dealer-hand" style="display: none;">{{ dealer_hand | tojson }}</div>  
-    <div id="player-hand" style="display: none;">{{ player_hand | tojson }}</div>    
+    <div id="player-hand" style="display: none;">{{ player_hand | tojson }}</div>   
+    <div id="deck" style="display: none;">{{ deck_instance | tojson }}</div>    
     <div class="container">
         <h1>♠️♥ BlackJack ♦️♣️</h1>
         <div id="dealer">
@@ -22,8 +23,8 @@
             <h2>Player: <span id="player-score"></span></h2>
             <div id="player-cards"></div>            
         </div>
-        <button type="button">HIT</button>
-        <button type="button">STAY</button>
+        <button type="button" id="hit-button">HIT</button>
+        <button type="button" id="stay-button">STAY</button>
     </div>
 </body>
 </html>

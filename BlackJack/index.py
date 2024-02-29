@@ -49,10 +49,24 @@ class Player:
     def __init__(self, name):
         self.name = name
         self.hand = []
+        self.score = 0
 
     def add_to_hand(self, card):
         self.hand.append(card)
 
+    def calculate_score(self):
+        self.score = 0
+        for card in self.hand:
+            self.score += card['value']
+        return self.score
+
+    def hit(self, deck):
+        self.add_to_hand(deck.draw_card())
+        return self.calculate_score()
+
+    def stay(self):
+        return self.calculate_score()
+    
 class Deck:
     def __init__(self):
         self.cards = []
@@ -62,7 +76,9 @@ class Deck:
             for suit in suits_collection.find():
                 self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})
 
-        random.shuffle(self.cards)
+        random.shuffle(self.cards)     
+
+        return self.cards   
 
     def draw_card(self):
         return self.cards.pop()
@@ -81,24 +97,52 @@ class BlackJackGame:
 
     def start_game(self):
         self.deck.create_deck()
+
         self.dealer.hand.clear()
         self.player.hand.clear()
-        for i in range(2):
-            self.dealer.add_to_hand(self.deck.draw_card())
-            self.player.add_to_hand(self.deck.draw_card())
+        self.dealer.add_to_hand(self.deck.draw_card())
+        self.player.add_to_hand(self.deck.draw_card())
+        self.player.add_to_hand(self.deck.draw_card())
 
+        return self.deck.cards
+    # def play_game(self):
+
+
+    def determine_winner(self):
+        dealer_score = self.dealer.calculate_score()
+        player_score = self.player.calculate_score()
+
+        if player_score > 21:  # Player busts
+            return "Dealer"
+        elif dealer_score > 21:  # Dealer busts
+            return "Player"
+        elif player_score == dealer_score:  # Tie
+            return "Tie"
+        elif player_score > dealer_score:  # Player wins
+            return "Player"
+        else:  # Dealer wins
+            return "Dealer"
+            
 # Creating a flask application instance
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    game = BlackJackGame()
-    game.start_game()
-    print(len(game.deck.cards))
+    game = BlackJackGame()    
+    deck_instance = game.start_game()
+    # print(len(game.deck.cards))
     dealer_hand = game.dealer.hand
     player_hand = game.player.hand
-    print(type(dealer_hand))
-    return render_template('index.html', dealer_hand=dealer_hand, player_hand=player_hand)
+    # print(type(dealer_hand))
+    return render_template('index.html', dealer_hand=dealer_hand, player_hand=player_hand, deck_instance=deck_instance)
+
+@app.route('/hit', methods=['POST'])
+def hit():
+    player = Player(request.json.get('player_name'))
+    deck = request.json.get('deck_instance')
+    print(len(deck))
+    score = player.hit(deck)
+    print(score)
 
 if __name__ == '__main__':
     app.run(debug=True)
