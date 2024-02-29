@@ -8,18 +8,19 @@
     <script src="../static/blackjack.js"></script>
 </head>
 <body>
-    <div id="dealer-hand" style="display: none;">{{ dealer_hand | tojson }}</div>    
+    <div id="dealer-hand" style="display: none;">{{ dealer_hand | tojson }}</div>  
+    <div id="player-hand" style="display: none;">{{ player_hand | tojson }}</div>    
     <div class="container">
         <h1>♠️♥ BlackJack ♦️♣️</h1>
         <div id="dealer">
-            <h2>Dealer</h2>
-            <div id="dealer_cards">
+            <h2>Dealer: <span id="dealer-score"></span></h2>
+            <div id="dealer-cards">
                 <img id="hidden" src="../static/images/cards/BACK.png">
             </div>            
         </div>
         <div id="player">
-            <h2>Player</h2>
-            <div class="player_cards"></div>            
+            <h2>Player: <span id="player-score"></span></h2>
+            <div id="player-cards"></div>            
         </div>
         <button type="button">HIT</button>
         <button type="button">STAY</button>

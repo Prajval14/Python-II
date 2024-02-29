@@ -45,36 +45,60 @@ history_collection = db['gamehistory']
 # db.cards.insert_many(cards_data)
 # db.suits.insert_many(suits_data)
 
-def createDeck():   
-    deck = []
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.hand = []
 
-    for card in cards_collection.find():
-        for suit in suits_collection.find():
-            deck.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})
+    def add_to_hand(self, card):
+        self.hand.append(card)
+
+class Deck:
+    def __init__(self):
+        self.cards = []
+
+    def create_deck(self):
+        for card in cards_collection.find():
+            for suit in suits_collection.find():
+                self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})
+
+        random.shuffle(self.cards)
+
+    def draw_card(self):
+        return self.cards.pop()
     
-    random.shuffle(deck)
+class Card:
+    def __init__(self, name, value, suit):
+        self.name = name
+        self.value = value
+        self.suit = suit
 
-    return deck
+class BlackJackGame:
+    def __init__(self):
+        self.deck = Deck()
+        self.dealer = Player('Dealer')
+        self.player = Player('Player')
 
-def distributeCards(deck):  
-    dealer_hand = []
-    player_hand = []
-
-    dealer_hand.append(deck.pop())
-    player_hand.append(deck.pop())
-    dealer_hand.append(deck.pop())
-    player_hand.append(deck.pop())
-
-    return dealer_hand
+    def start_game(self):
+        self.deck.create_deck()
+        self.dealer.hand.clear()
+        self.player.hand.clear()
+        for i in range(2):
+            self.dealer.add_to_hand(self.deck.draw_card())
+            self.player.add_to_hand(self.deck.draw_card())
 
 # Creating a flask application instance
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    initial_deck = createDeck()
-    dealer_hand = distributeCards(initial_deck)
-    return render_template('index.html', dealer_hand=dealer_hand)
+    game = BlackJackGame()
+    game.start_game()
+    print(len(game.deck.cards))
+    dealer_hand = game.dealer.hand
+    player_hand = game.player.hand
+    print(type(dealer_hand))
+    return render_template('index.html', dealer_hand=dealer_hand, player_hand=player_hand)
 
 if __name__ == '__main__':
     app.run(debug=True)
