@@ -14,24 +14,50 @@ body {
 
 .container img {
     width: 10%;
-    margin: 0 auto;
 }
 
-.container button {
+.container button, #restart-game {
     color: white;
     background-color: black;
-    padding: 10px;
+    padding: 10px 20px;
     border: none;
     border-radius: 50px;   
     margin-top: 20px; 
-    width: 100px;
     letter-spacing: 2px;
     font-weight: bold;
     font-size: 20px;
 }
 
-.container button:active {
+.container button:active, #restart-game:active {
     border: 2px solid red;    
+}
+
+#over-lay {
+    display: none;
+    position: fixed;
+    text-align: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;     
+}
+
+.over-lay-content {
+    height: 300px;
+    width: 300px;
+    margin: auto;
+    margin-top: 150px;
+}
+
+.over-lay-content h1 {
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.over-lay-content img {
+    width: 90%;
 }
 
 /* Media query for tablets (portrait and landscape) */

@@ -6,8 +6,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     distributeCardsAndScore(game_dealer_hand, game_player_hand, game_dealer_score, game_player_score);
 
-    //vanilla JavaScript's fetch API.
     document.getElementById('hit-button').addEventListener('click', function() {
+        //vanilla JavaScript's fetch API.
         fetch('/hit', {
             method: 'POST',
             headers: {
@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error('Error:', error);
         });
     });    
+
+    document.getElementById('restart-game').addEventListener('click', function() {
+        location.reload();
+    });
 });
 
 function distributeCardsAndScore(game_dealer_hand, game_player_hand, game_dealer_score, game_player_score) {
@@ -47,4 +51,12 @@ function updatePlayerCardsAndScore(response) {
     document.getElementById("player-cards").append(cardImg);
 
     document.getElementById("player-score").innerText = response[1];
+
+    if(response[1] > 21){
+        let overlayImg = document.createElement("img");
+        overlayImg.src = "../static/images/busted.png"
+        document.getElementById("over-lay-image").append(overlayImg);
+        document.getElementById("over-lay-msg").innerText = 'Dealer Wins!';
+        document.getElementById("over-lay").style.display = 'block';
+    }
 }
