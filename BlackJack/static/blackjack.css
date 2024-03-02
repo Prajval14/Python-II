@@ -19,10 +19,19 @@ body {
 
 .container button {
     color: white;
-    background-color: red;
+    background-color: black;
     padding: 10px;
     border: none;
-    border-radius: 6px;    
+    border-radius: 50px;   
+    margin-top: 20px; 
+    width: 100px;
+    letter-spacing: 2px;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.container button:active {
+    border: 2px solid red;    
 }
 
 /* Media query for tablets (portrait and landscape) */

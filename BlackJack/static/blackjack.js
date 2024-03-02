@@ -45,4 +45,6 @@ function updatePlayerCardsAndScore(response) {
     let cardImg = document.createElement("img");
     cardImg.src = "../static/images/cards/" + response[0].value + "-" + response[0].suit + ".png";
     document.getElementById("player-cards").append(cardImg);
+
+    document.getElementById("player-score").innerText = response[1];
 }
