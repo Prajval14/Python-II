@@ -7,10 +7,12 @@
     <link rel="stylesheet" href="../static/blackjack.css" />
     <script src="../static/blackjack.js"></script>
 </head>
-<body>
-    <div id="dealer-hand" style="display: none;">{{ dealer_hand | tojson }}</div>  
-    <div id="player-hand" style="display: none;">{{ player_hand | tojson }}</div>   
-    <div id="deck" style="display: none;">{{ deck_instance | tojson }}</div>    
+<body>    
+    <div id="game-dealer-hand" style="display: none;">{{ game_dealer_hand | tojson }}</div>  
+    <div id="game-player-hand" style="display: none;">{{ game_player_hand | tojson }}</div>   
+    <div id="game-dealer-score" style="display: none;">{{ game_dealer_score }}</div>   
+    <div id="game-player-score" style="display: none;">{{ game_player_score }}</div>   
+
     <div class="container">
         <h1>♠️♥ BlackJack ♦️♣️</h1>
         <div id="dealer">
