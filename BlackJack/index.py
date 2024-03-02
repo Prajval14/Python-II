@@ -1,7 +1,8 @@
-from flask import Flask, request, render_template
+from flask import Flask, render_template, jsonify
 from pymongo import MongoClient
 import random
 
+# -----------------------------------------------------------------------------------
 # MongoDB configuration
 client = MongoClient('localhost', 27017)
 db = client['blackjack']
@@ -44,8 +45,17 @@ history_collection = db['gamehistory']
 # db.players.insert_many(player_data)
 # db.cards.insert_many(cards_data)
 # db.suits.insert_many(suits_data)
+# -----------------------------------------------------------------------------------
 
-class Player:
+# Declaring and initializing variables (used in a game instance)
+game_deck = [];
+game_player_hand = [];
+game_dealer_hand = [];
+game_player_score = 0;
+game_dealer_score = 0;
+
+# Defining classes and related attributes and functions
+class Players:
     def __init__(self, name):
         self.name = name
         self.hand = []
@@ -55,14 +65,15 @@ class Player:
         self.hand.append(card)
 
     def calculate_score(self):
-        self.score = 0
+        self.score = 0        
         for card in self.hand:
             self.score += card['value']
         return self.score
 
     def hit(self, deck):
-        self.add_to_hand(deck.draw_card())
-        return self.calculate_score()
+        new_card = deck.pop()
+        self.add_to_hand(new_card)
+        return new_card
 
     def stay(self):
         return self.calculate_score()
@@ -74,16 +85,16 @@ class Deck:
     def create_deck(self):
         for card in cards_collection.find():
             for suit in suits_collection.find():
-                self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})
-
-        random.shuffle(self.cards)     
-
+                self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})    
         return self.cards   
+
+    def shuffle_deck(self):
+        return random.shuffle(self.cards)             
 
     def draw_card(self):
         return self.cards.pop()
     
-class Card:
+class Cards:
     def __init__(self, name, value, suit):
         self.name = name
         self.value = value
@@ -92,57 +103,62 @@ class Card:
 class BlackJackGame:
     def __init__(self):
         self.deck = Deck()
-        self.dealer = Player('Dealer')
-        self.player = Player('Player')
+        self.dealer = Players('dealer')
+        self.player = Players('player')
 
     def start_game(self):
         self.deck.create_deck()
-
+        
+        self.deck.shuffle_deck()
+        
         self.dealer.hand.clear()
         self.player.hand.clear()
+        
         self.dealer.add_to_hand(self.deck.draw_card())
         self.player.add_to_hand(self.deck.draw_card())
         self.player.add_to_hand(self.deck.draw_card())
 
+        self.dealer.calculate_score()
+        self.player.calculate_score()
+
         return self.deck.cards
-    # def play_game(self):
-
-
-    def determine_winner(self):
-        dealer_score = self.dealer.calculate_score()
-        player_score = self.player.calculate_score()
-
-        if player_score > 21:  # Player busts
-            return "Dealer"
-        elif dealer_score > 21:  # Dealer busts
-            return "Player"
-        elif player_score == dealer_score:  # Tie
-            return "Tie"
-        elif player_score > dealer_score:  # Player wins
-            return "Player"
-        else:  # Dealer wins
-            return "Dealer"
             
 # Creating a flask application instance
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
-    game = BlackJackGame()    
-    deck_instance = game.start_game()
-    # print(len(game.deck.cards))
-    dealer_hand = game.dealer.hand
-    player_hand = game.player.hand
-    # print(type(dealer_hand))
-    return render_template('index.html', dealer_hand=dealer_hand, player_hand=player_hand, deck_instance=deck_instance)
+    global game_deck, game_dealer_hand, game_player_hand, game_dealer_score, game_player_score
+
+    create_game = BlackJackGame()    
+    game_deck = create_game.start_game()       
+    game_dealer_hand = create_game.dealer.hand
+    game_player_hand = create_game.player.hand
+    game_dealer_score = create_game.dealer.score
+    game_player_score = create_game.player.score
+
+    return render_template('index.html',
+    game_dealer_hand = game_dealer_hand, 
+    game_player_hand = game_player_hand,
+    game_dealer_score = game_dealer_score,
+    game_player_score = game_player_score)
 
 @app.route('/hit', methods=['POST'])
-def hit():
-    player = Player(request.json.get('player_name'))
-    deck = request.json.get('deck_instance')
-    print(len(deck))
-    score = player.hit(deck)
-    print(score)
+def hit():    
+    global game_deck, game_dealer_hand, game_player_hand, game_dealer_score, game_player_score
+    # print(len(game_deck))
+    player = Players('player')
+    player.hand = game_player_hand    
+    # print('1', game_player_hand)
+    # print('2', game_player_score)
+    hit_card = player.hit(game_deck)
+    # print(len(game_deck))
+    game_player_hand = player.hand
+    game_player_score = player.calculate_score()
+    # print('3', game_player_hand)
+    # print('4', game_player_score)
+    print('5', hit_card)
+    return jsonify(hit_card, game_player_score)
 
 if __name__ == '__main__':
     app.run(debug=True)

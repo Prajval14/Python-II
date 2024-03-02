@@ -1,63 +1,48 @@
 document.addEventListener("DOMContentLoaded", function() {
-    let dealer_hand = JSON.parse(document.getElementById("dealer-hand").textContent);
-    let player_hand = JSON.parse(document.getElementById("player-hand").textContent); 
-    let deck_instance = JSON.parse(document.getElementById("deck").textContent); 
-    // console.log(deck_instance);
-    // debugger
-    let dealerSum = 0;
-    let playerSum = 0;
+    let game_dealer_hand = JSON.parse(document.getElementById("game-dealer-hand").textContent);
+    let game_player_hand = JSON.parse(document.getElementById("game-player-hand").textContent);  
+    let game_dealer_score = JSON.parse(document.getElementById("game-dealer-score").textContent);
+    let game_player_score = JSON.parse(document.getElementById("game-player-score").textContent);     
 
-    const scores = startGame(dealer_hand, player_hand, dealerSum, playerSum);
-    
-    document.getElementById("hit-button").addEventListener("click", function() {
-        hit(deck_instance, scores.dealerSum, scores.playerSum);
-    });
-    document.getElementById("stay-button").addEventListener("click", function() {
-        stay(deck_instance, scores.dealerSum, scores.playerSum);
-    });
+    distributeCardsAndScore(game_dealer_hand, game_player_hand, game_dealer_score, game_player_score);
+
+    //vanilla JavaScript's fetch API.
+    document.getElementById('hit-button').addEventListener('click', function() {
+        fetch('/hit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            updatePlayerCardsAndScore(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });    
 });
 
-function startGame(dealer_hand, player_hand, dealerSum, playerSum) {
-    for(let card in dealer_hand) {        
-        dealerSum += dealer_hand[card].value;
-        
+function distributeCardsAndScore(game_dealer_hand, game_player_hand, game_dealer_score, game_player_score) {
+    for(let card in game_dealer_hand) {                
         let cardImg = document.createElement("img");
-        cardImg.src = "../static/images/cards/" + dealer_hand[card].value + "-" + dealer_hand[card].suit + ".png";
+        cardImg.src = "../static/images/cards/" + game_dealer_hand[card].value + "-" + game_dealer_hand[card].suit + ".png";
         document.getElementById("dealer-cards").append(cardImg);
     }
-    for(let card in player_hand) {        
-        playerSum += player_hand[card].value;
-        
+    for(let card in game_player_hand) {                
         let cardImg = document.createElement("img");
-        cardImg.src = "../static/images/cards/" + player_hand[card].value + "-" + player_hand[card].suit + ".png";
+        cardImg.src = "../static/images/cards/" + game_player_hand[card].value + "-" + game_player_hand[card].suit + ".png";
         document.getElementById("player-cards").append(cardImg);
     }
     
-    document.getElementById("dealer-score").innerText = dealerSum;
-    document.getElementById("player-score").innerText = playerSum;
-
-    return { dealerSum, playerSum };
+    document.getElementById("dealer-score").innerText = game_dealer_score;
+    document.getElementById("player-score").innerText = game_player_score;
 }
 
-function hit(deck_instance, dealerSum, playerSum) {
-    // debugger
-    let playerName = "Player";  
-    fetch('/hit', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ player_name: playerName, deck_instance:deck_instance, dealer_score: dealerSum, player_score: playerSum })
-    });
-}
-
-function stay(dealerSum, playerSum) {
-    let playerName = "Player";
-    fetch('/stay', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ player_name: playerName, dealer_score: dealerSum, player_score: playerSum })
-    });
+function updatePlayerCardsAndScore(response) {
+    console.log(response)
+    let cardImg = document.createElement("img");
+    cardImg.src = "../static/images/cards/" + response[0].value + "-" + response[0].suit + ".png";
+    document.getElementById("player-cards").append(cardImg);
 }
