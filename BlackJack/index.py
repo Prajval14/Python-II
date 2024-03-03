@@ -9,7 +9,6 @@ db = client['blackjack']
 players_collection = db['players']
 cards_collection = db['cards']
 suits_collection = db['suits']
-history_collection = db['gamehistory']
 
 # database_name = 'blackjack'
 # client.drop_database(database_name)
@@ -20,19 +19,19 @@ history_collection = db['gamehistory']
 # ]
 
 # cards_data = [
-#     {'name': 'ace', 'value': 1},
-#     {'name': 'two', 'value': 2},
-#     {'name': 'three', 'value': 3},
-#     {'name': 'four', 'value': 4},
-#     {'name': 'five', 'value': 5},
-#     {'name': 'six', 'value': 6},
-#     {'name': 'seven', 'value': 7},
-#     {'name': 'eight', 'value': 8},
-#     {'name': 'nine', 'value': 9},
-#     {'name': 'ten', 'value': 10},
-#     {'name': 'jack', 'value': 10},
-#     {'name': 'queen', 'value': 10},
-#     {'name': 'king', 'value': 10},
+#     {'name': '1', 'value': 1},
+#     {'name': '2', 'value': 2},
+#     {'name': '3', 'value': 3},
+#     {'name': '4', 'value': 4},
+#     {'name': '5', 'value': 5},
+#     {'name': '6', 'value': 6},
+#     {'name': '7', 'value': 7},
+#     {'name': '8', 'value': 8},
+#     {'name': '9', 'value': 9},
+#     {'name': '10', 'value': 10},
+#     {'name': 'J', 'value': 10},
+#     {'name': 'Q', 'value': 10},
+#     {'name': 'K', 'value': 10},
 # ]
 
 # suits_data = [
@@ -63,15 +62,13 @@ class Players:
         for card in self.hand:
             self.score += card['value']
         return self.score
-
-    def stay(self):
-        return self.calculate_score()
     
 class Deck:
     def __init__(self):
         self.cards = []
 
     def create_deck(self):
+        self.cards.clear()
         for card in cards_collection.find():
             for suit in suits_collection.find():
                 self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})                    
@@ -104,7 +101,6 @@ class BlackJackGame:
         else:
             return 'game-error'
         
-
 game_instance = BlackJackGame()
 
 # Creating a flask application instance
@@ -124,7 +120,7 @@ def index():
     game_instance.player.add_to_hand(game_instance.deck.draw_card())
 
     game_instance.dealer.calculate_score()
-    game_instance.player.calculate_score()
+    game_instance.player.calculate_score()    
 
     return render_template('index.html',
     game_dealer_hand = game_instance.dealer.hand, 
@@ -136,7 +132,13 @@ def index():
 def hit():    
     hit_card = game_instance.player.add_to_hand(game_instance.deck.draw_card())
     game_instance.player.calculate_score()
-    return jsonify(hit_card, game_instance.player.score)
+
+    if(game_instance.player.score > 21):
+        game_result = game_instance.declare_winner()
+        return jsonify(hit_card, game_instance.player.score, game_result)
+    else:
+        return jsonify(hit_card, game_instance.player.score)
+    
 
 @app.route('/stay', methods=['POST'])
 def stay(): 
@@ -144,7 +146,10 @@ def stay():
     while game_instance.dealer.score < 17:        
         hit_cards.append(game_instance.dealer.add_to_hand(game_instance.deck.draw_card()))
         game_instance.dealer.calculate_score()
-    return jsonify(hit_cards, game_instance.dealer.score)
+    
+    game_result = game_instance.declare_winner()
+
+    return jsonify(hit_cards, game_result)
 
 if __name__ == '__main__':
     app.run(debug=True)
