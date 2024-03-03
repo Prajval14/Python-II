@@ -77,7 +77,7 @@ function updatePlayerCardsAndScore(response) {
 }
 
 // Function to set dealer's hand if player choose to stay
-function updateDealerCardsAndScore(response) {     
+async function updateDealerCardsAndScore(response) {     
     let hiddenImg = document.getElementById('hidden-img');
     let dealerScore = parseInt(document.getElementById("dealer-score").innerText)
 
@@ -90,11 +90,10 @@ function updateDealerCardsAndScore(response) {
     for(let i = 1; i < response[0].length; i++) {
         let cardImg = document.createElement("img");
         cardImg.src = "../static/images/cards/" + response[0][i].name + "-" + response[0][i].suit + ".png";
-        setTimeout(function() {            
-            document.getElementById("dealer-cards").append(cardImg);
-            dealerScore += response[0][i].value;
-            document.getElementById("dealer-score").innerText = dealerScore;
-        }, 1000 * i);        
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Pause execution for 1 second
+        document.getElementById("dealer-cards").append(cardImg);
+        dealerScore += response[0][i].value;
+        document.getElementById("dealer-score").innerText = dealerScore;      
     }  
     
     //Finally declare winners and end game
