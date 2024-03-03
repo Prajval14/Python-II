@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify
 from pymongo import MongoClient
 import random
+import datetime
 
 # -----------------------------------------------------------------------------------
 # MongoDB configuration
@@ -9,6 +10,7 @@ db = client['blackjack']
 players_collection = db['players']
 cards_collection = db['cards']
 suits_collection = db['suits']
+history_collection = db['history']
 
 # database_name = 'blackjack'
 # client.drop_database(database_name)
@@ -101,6 +103,12 @@ class BlackJackGame:
         else:
             return 'game-error'
         
+def record_game_status(game_result):
+    current_datetime = datetime.datetime.now()
+    formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+    result_data = {'Date' : formatted_datetime, 'Result' : game_result}
+    history_collection.insert_one(result_data)
+
 game_instance = BlackJackGame()
 
 # Creating a flask application instance
@@ -135,6 +143,10 @@ def hit():
 
     if(game_instance.player.score > 21):
         game_result = game_instance.declare_winner()
+
+        if(game_result):
+            record_game_status(game_result)  
+    
         return jsonify(hit_card, game_instance.player.score, game_result)
     else:
         return jsonify(hit_card, game_instance.player.score)
@@ -148,6 +160,9 @@ def stay():
         game_instance.dealer.calculate_score()
     
     game_result = game_instance.declare_winner()
+
+    if(game_result):
+        record_game_status(game_result)        
 
     return jsonify(hit_cards, game_result)
 
