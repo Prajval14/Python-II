@@ -47,13 +47,6 @@ history_collection = db['gamehistory']
 # db.suits.insert_many(suits_data)
 # -----------------------------------------------------------------------------------
 
-# Declaring and initializing variables (used in a game instance)
-game_deck = [];
-game_player_hand = [];
-game_dealer_hand = [];
-game_player_score = 0;
-game_dealer_score = 0;
-
 # Defining classes and related attributes and functions
 class Players:
     def __init__(self, name):
@@ -63,17 +56,13 @@ class Players:
 
     def add_to_hand(self, card):
         self.hand.append(card)
+        return card
 
     def calculate_score(self):
         self.score = 0        
         for card in self.hand:
             self.score += card['value']
         return self.score
-
-    def hit(self, deck):
-        new_card = deck.pop()
-        self.add_to_hand(new_card)
-        return new_card
 
     def stay(self):
         return self.calculate_score()
@@ -85,20 +74,15 @@ class Deck:
     def create_deck(self):
         for card in cards_collection.find():
             for suit in suits_collection.find():
-                self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})    
+                self.cards.append({'name': card['name'], 'value': card['value'], 'suit': suit['value']})                    
         return self.cards   
 
     def shuffle_deck(self):
         return random.shuffle(self.cards)             
 
     def draw_card(self):
-        return self.cards.pop()
-    
-class Cards:
-    def __init__(self, name, value, suit):
-        self.name = name
-        self.value = value
-        self.suit = suit
+        drawn_card = self.cards.pop()     
+        return drawn_card
 
 class BlackJackGame:
     def __init__(self):
@@ -106,59 +90,61 @@ class BlackJackGame:
         self.dealer = Players('dealer')
         self.player = Players('player')
 
-    def start_game(self):
-        self.deck.create_deck()
+    def declare_winner(self):
+        if self.dealer.score > 21:
+            return 'dealer-busted'
+        elif self.player.score > 21:
+            return 'player-busted'
+        elif self.dealer.score == self.player.score:
+            return 'tie'
+        elif self.dealer.score > self.player.score:
+            return 'dealer-win'
+        elif self.player.score > self.dealer.score:
+            return 'player-win'
+        else:
+            return 'game-error'
         
-        self.deck.shuffle_deck()
-        
-        self.dealer.hand.clear()
-        self.player.hand.clear()
-        
-        self.dealer.add_to_hand(self.deck.draw_card())
-        self.player.add_to_hand(self.deck.draw_card())
-        self.player.add_to_hand(self.deck.draw_card())
 
-        self.dealer.calculate_score()
-        self.player.calculate_score()
+game_instance = BlackJackGame()
 
-        return self.deck.cards
-            
 # Creating a flask application instance
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
-def index():
-    global game_deck, game_dealer_hand, game_player_hand, game_dealer_score, game_player_score
+def index():       
+    game_instance.deck.create_deck()
 
-    create_game = BlackJackGame()    
-    game_deck = create_game.start_game()       
-    game_dealer_hand = create_game.dealer.hand
-    game_player_hand = create_game.player.hand
-    game_dealer_score = create_game.dealer.score
-    game_player_score = create_game.player.score
+    game_instance.deck.shuffle_deck()
+
+    game_instance.dealer.hand.clear()
+    game_instance.player.hand.clear()
+
+    game_instance.dealer.add_to_hand(game_instance.deck.draw_card())
+    game_instance.player.add_to_hand(game_instance.deck.draw_card())
+    game_instance.player.add_to_hand(game_instance.deck.draw_card())
+
+    game_instance.dealer.calculate_score()
+    game_instance.player.calculate_score()
 
     return render_template('index.html',
-    game_dealer_hand = game_dealer_hand, 
-    game_player_hand = game_player_hand,
-    game_dealer_score = game_dealer_score,
-    game_player_score = game_player_score)
+    game_dealer_hand = game_instance.dealer.hand, 
+    game_player_hand = game_instance.player.hand,
+    game_dealer_score = game_instance.dealer.score,
+    game_player_score = game_instance.player.score)
 
 @app.route('/hit', methods=['POST'])
 def hit():    
-    global game_deck, game_dealer_hand, game_player_hand, game_dealer_score, game_player_score
-    # print(len(game_deck))
-    player = Players('player')
-    player.hand = game_player_hand    
-    # print('1', game_player_hand)
-    # print('2', game_player_score)
-    hit_card = player.hit(game_deck)
-    # print(len(game_deck))
-    game_player_hand = player.hand
-    game_player_score = player.calculate_score()
-    # print('3', game_player_hand)
-    # print('4', game_player_score)
-    print('5', hit_card)
-    return jsonify(hit_card, game_player_score)
+    hit_card = game_instance.player.add_to_hand(game_instance.deck.draw_card())
+    game_instance.player.calculate_score()
+    return jsonify(hit_card, game_instance.player.score)
+
+@app.route('/stay', methods=['POST'])
+def stay(): 
+    hit_cards = []
+    while game_instance.dealer.score < 17:        
+        hit_cards.append(game_instance.dealer.add_to_hand(game_instance.deck.draw_card()))
+        game_instance.dealer.calculate_score()
+    return jsonify(hit_cards, game_instance.dealer.score)
 
 if __name__ == '__main__':
     app.run(debug=True)
