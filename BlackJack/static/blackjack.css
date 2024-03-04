@@ -66,6 +66,18 @@ body {
         background-size: auto;
         background-repeat: repeat;
     }
+
+    .container {
+        font-size: x-large;
+    }
+
+    .container img {
+        width: 25%;
+    }
+
+    .over-lay-content {
+        margin-top: 320px;
+    }
 }
 
 /* Media query for mobile devices */
@@ -73,4 +85,16 @@ body {
     body {
         background-size: auto;
     }
+
+    .container {
+        font-size: 20px;
+    }
+
+    .container img {
+        width: 30%;
+    }
+
+    /* .over-lay-content {
+        margin-top: 320px;
+    } */
 }
