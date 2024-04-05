@@ -1,0 +1,142 @@
+#row1_button {
+    flex-direction: column;
+}
+
+#row1 a {
+    margin-bottom: 10px;
+}
+
+#row2 {
+    background-color: #94BF9D;
+    display: block;
+}
+
+#row2_col1 {
+    background-image: url('https://images.stockcake.com/public/f/e/6/fe62c8ee-64e2-49e0-b0f9-fedbdec40a93_large/colorful-exercise-balls-stockcake.jpg');
+    height: 500px;
+    background-size: cover;
+    margin: 0 auto;
+}
+
+#row2_col3 {
+    background-image: url('https://images.stockcake.com/public/e/a/3/ea3ec6e0-a042-45e8-b95e-fe6b9afd0fd5_large/gym-ready-gear-stockcake.jpg');
+    height: 500px;
+    background-size: cover;
+    margin: 1.5rem;
+    border-radius: 10px;
+    display: none;
+}
+
+#row3 i, #row4 i, #row6 i {
+    display: flex;
+}
+
+#row5 {
+    background-image: url('https://images.stockcake.com/public/e/0/0/e0059a2a-ef86-4fe0-b92c-095a6eb6ddc7_large/hydration-workout-essential-stockcake.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 600px;    
+}
+
+#row5_content {
+    margin-top: 250px;
+}
+
+#row5 a {
+    width: 100%;
+    margin-top: 20px;
+}
+
+#row7 {
+    display: block;
+    margin: 0;
+    padding: 16px;
+}
+
+#row7 .col {
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 8px;
+    height: 600px;
+    margin: 10px 0px;
+    padding: 30px 20px;
+}
+
+#row7_col1 {
+    background-image: url('https://images.stockcake.com/public/5/7/a/57ace551-778c-4fee-8c30-a296f1e04d4a_large/gym-rest-time-stockcake.jpg');
+}
+
+#row7_col2 {
+    background-image: url('https://images.stockcake.com/public/d/4/8/d4873aab-fb18-4b88-8e0c-07b65c080db1_large/zen-home-setup-stockcake.jpg');
+}
+
+#row7_col3 {
+    background-image: url('https://images.stockcake.com/public/5/7/5/575e68cf-edd1-4a0b-be48-0a69c633a076_large/herbal-medicine-preparation-stockcake.jpg');
+}
+
+#row7_highlight {
+    color: #94BF9D;
+    font-weight: 600;
+}
+
+#add_to_cart_button {
+    background-color: #054F98;    
+}
+
+#add_to_cart_button.added {
+    background-color: #94BF9D;
+    color: black;
+}
+
+/* Media query for screens with a minimum width of 768 pixels and a maximum of 1023 pixels (typical for tablets) */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+
+}
+
+/* Media query for screens with a minimum width of 1024 pixels (typical for desktops) */
+@media only screen and (min-width: 1025px) {
+    #row1_button {
+        flex-direction: row;
+    }
+
+    #row1 a {
+        margin-right: 10px;
+        margin-bottom: 0;
+    }
+
+    #row2 {
+        text-align: center;
+        display: flex;
+    }
+
+    #row2_col1 {
+        margin: 1.5rem;
+        border-radius: 10px;
+    }
+    
+    #row2_col3 {
+        display: flex;
+    }
+
+    #row3 i, #row4 i, #row6 i {
+        display: none;
+    }
+    
+    #row5 {
+        background-image: url('https://images.stockcake.com/public/a/2/0/a20742d0-abc3-4890-a546-efa5b48bfd7f/gym-hydration-essential-stockcake.jpg');
+    }
+
+    #row5 a {
+        width: auto;
+        margin: 0;
+    }
+
+    #row7 {
+        display: flex;
+        margin: 0;
+    }
+
+    #row7 .col {
+        margin: 0px 10px;
+    }
+}
